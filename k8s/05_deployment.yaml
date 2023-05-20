@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+  namespace: ns-talk
+  labels:
+    component: web
+    resource: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: web
+      resource: api
+  template:
+    metadata:
+      labels:
+        component: web
+        resource: api
+    spec:
+      containers:
+        - name: api-server
+          image: ns-talk:2023
+          imagePullPolicy: Never
+          workingDir: /usr/src/app
+          command:
+            - node
+            - dist/index.js
+          ports:
+            - containerPort: 8080
+              name: listening-port
+              protocol: TCP
+            - containerPort: 9229
+              name: debug-port
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - cat
+                - /usr/src/app/dist/index.js
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          env:
+            - name: PORT
+              value: "8080"
+            - name: TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: topic
+            - name: VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: version
+            - name: ALIAS
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: alias
+            - name: SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secrets
+                  key: my-secret

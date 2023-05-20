@@ -1,0 +1,17 @@
+{
+  "name": "ns-talk-2023",
+  "version": "1.0.0",
+  "description": "This is a demo with the first steps in kubernetes",
+  "main": "src/index.js",
+  "scripts": {
+    "ns:create": "kubectl apply -f ./k8s/00_namespace.yaml",
+    "ns:delete": "kubectl delete -f ./k8s/00_namespace.yaml",
+    "pod:create": "kubectl apply -f ./k8s/01_pod.yaml",
+    "pod:pf": "kubectl -n ns-talk port-forward nginx 30006:80",
+    "pod:logs": "kubectl -n ns-talk logs -f nginx",
+    "pod:delete": "kubectl delete -f ./k8s/01_pod.yaml"
+  },
+  "keywords": [],
+  "author": "Sergio Salgado",
+  "license": "ISC"
+}
